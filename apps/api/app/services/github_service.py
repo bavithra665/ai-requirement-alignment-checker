@@ -58,11 +58,14 @@ class GitHubService:
         try:
             client = _get_github_client()
             user = client.get_user()
+            rate_limit_info = client.get_rate_limit()
+            remaining = rate_limit_info.rate.remaining if hasattr(rate_limit_info, "rate") else rate_limit_info.core.remaining
+            
             return {
                 "configured": True,
                 "connected": True,
                 "github_user": user.login,
-                "rate_limit_remaining": client.get_rate_limit().core.remaining,
+                "rate_limit_remaining": remaining,
             }
         except Exception as exc:
             return {"configured": True, "connected": False, "error": str(exc)}
