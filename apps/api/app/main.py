@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
-from app.api.routes import auth, projects, upload, requirements, jira, github, alignment, reports, system
+from app.api.routes import auth, projects, upload, requirements, jira, github, alignment, reports, system, notifications, client
 
 tags_metadata = [
     {"name": "system", "description": "System health and demo workspace seeding endpoints."},
@@ -42,6 +42,8 @@ app.include_router(github.router, prefix=f"{settings.API_V1_STR}/github", tags=[
 app.include_router(alignment.router, prefix=f"{settings.API_V1_STR}/alignment", tags=["alignment"])
 app.include_router(reports.router, prefix=f"{settings.API_V1_STR}/reports", tags=["reports"])
 app.include_router(system.router, prefix=f"{settings.API_V1_STR}/system", tags=["system"])
+app.include_router(notifications.router, prefix=f"{settings.API_V1_STR}/notifications", tags=["notifications"])
+app.include_router(client.router, prefix=f"{settings.API_V1_STR}/client", tags=["client"])
 
 @app.get("/api/health")
 async def health_check():

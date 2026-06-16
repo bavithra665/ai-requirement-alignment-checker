@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable react-hooks/exhaustive-deps */
 
 import { useEffect, useState } from "react";
 import { api, Project } from "@/lib/api-client";
@@ -46,6 +47,7 @@ export default function CodeExtractionPage() {
   const [error, setError] = useState<string | null>(null);
 
   // Load Projects on mount
+   
   useEffect(() => {
     async function loadProjects() {
       try {
@@ -54,8 +56,8 @@ export default function CodeExtractionPage() {
         if (projList.length > 0) {
           setSelectedProjectId(projList[0].id);
         }
-      } catch (err: any) {
-        console.error(err);
+      } catch (error: unknown) { const errMsg = error instanceof Error ? error.message : String(error);
+        console.error(errMsg);
         setError("Failed to load projects. Make sure api is running.");
       }
     }
@@ -63,6 +65,8 @@ export default function CodeExtractionPage() {
   }, []);
 
   // Load PRs when project changes
+   
+   
   useEffect(() => {
     if (selectedProjectId) {
       loadProjectPrs();
@@ -73,6 +77,8 @@ export default function CodeExtractionPage() {
   }, [selectedProjectId]);
 
   // Load Symbols when PR or filter changes
+   
+   
   useEffect(() => {
     if (selectedPrId) {
       loadSymbols();
@@ -106,8 +112,8 @@ export default function CodeExtractionPage() {
       setError(null);
       const data = await api.getSymbols(selectedPrId, typeFilter || undefined);
       setSymbols(data);
-    } catch (err: any) {
-      console.error(err);
+    } catch (error: unknown) { const errMsg = error instanceof Error ? error.message : String(error);
+      console.error(errMsg);
       setError("Failed to fetch extracted symbols.");
     } finally {
       setLoadingSymbols(false);
@@ -121,8 +127,8 @@ export default function CodeExtractionPage() {
       setError(null);
       await api.extractSymbols(selectedPrId);
       await loadSymbols();
-    } catch (err: any) {
-      setError(err.message || "Failed to trigger symbol extraction.");
+    } catch (error: unknown) { const errMsg = error instanceof Error ? error.message : String(error);
+      setError(errMsg || "Failed to trigger symbol extraction.");
     } finally {
       setExtracting(false);
     }

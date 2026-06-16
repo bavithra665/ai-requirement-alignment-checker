@@ -113,31 +113,52 @@ export interface ExecutiveReport {
 // Fetch helper that automatically includes cookies/headers
 async function apiFetch(endpoint: string, options: RequestInit = {}) {
   const url = endpoint.startsWith("http") ? endpoint : `${API_V1}${endpoint}`;
-  
-  // Set credentials to include HttpOnly cookies
+
   const headers = new Headers(options.headers || {});
   if (!headers.has("Content-Type") && !(options.body instanceof FormData)) {
     headers.set("Content-Type", "application/json");
   }
-  
-  // Retrieve token from local storage if cookies don't work due to cross-origin issues
+
   const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
   if (token) {
     headers.set("Authorization", `Bearer ${token}`);
   }
 
-  const response = await fetch(url, {
-    ...options,
-    headers,
-    credentials: "omit", // Using token for cross-origin local dev is more reliable
-  });
+  async function executeFetch(useAuth: boolean) {
+    const requestHeaders = new Headers(headers);
+    if (!useAuth) {
+      requestHeaders.delete("Authorization");
+    }
+    return fetch(url, {
+      ...options,
+      headers: requestHeaders,
+      credentials: "omit",
+    });
+  }
+
+  let response = await executeFetch(!!token);
+
+  if (response.status === 401) {
+    const errorJson = await response.json().catch(() => null);
+    const errorDetail = errorJson?.detail || "API Request failed";
+
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("token");
+    }
+
+    if (token) {
+      response = await executeFetch(false);
+    } else {
+      throw new Error(errorDetail);
+    }
+  }
 
   if (!response.ok) {
     let errorDetail = "API Request failed";
     try {
       const errorJson = await response.json();
       errorDetail = errorJson.detail || errorDetail;
-    } catch (_) {}
+    } catch (error: unknown) { void error; }
     throw new Error(errorDetail);
   }
 
@@ -160,7 +181,7 @@ export const api = {
     return data;
   },
 
-  async register(userData: any) {
+  async register(userData: Record<string, unknown>) {
     return apiFetch("/auth/register", {
       method: "POST",
       body: JSON.stringify(userData),
@@ -175,7 +196,7 @@ export const api = {
     localStorage.removeItem("token");
     try {
       return await apiFetch("/auth/logout", { method: "POST" });
-    } catch (_) {
+    } catch (error: unknown) { void error; 
       return { message: "Logged out" };
     }
   },
@@ -196,7 +217,7 @@ export const api = {
       try {
         const me = await this.getMe();
         owner_id = me.id;
-      } catch (_) {
+      } catch (error: unknown) { void error; 
         // Fallback to random/dummy UUID for unauthenticated dev mode
         owner_id = "00000000-0000-0000-0000-000000000000";
       }
@@ -214,14 +235,14 @@ export const api = {
     });
   },
 
-  async deleteProject(id: string): Promise<any> {
+  async deleteProject(id: string): Promise<unknown> {
     return apiFetch(`/projects/${id}`, {
       method: "DELETE",
     });
   },
 
   // Requirements & Upload
-  async uploadBRD(projectId: string, file: File): Promise<any> {
+  async uploadBRD(projectId: string, file: File): Promise<unknown> {
     const formData = new FormData();
     formData.append("file", file);
     return apiFetch(`/projects/${projectId}/upload-brd`, {
@@ -234,7 +255,7 @@ export const api = {
     return apiFetch(`/requirements/project/${projectId}`);
   },
 
-  async reviewRequirement(versionId: string, action: "approve" | "request_changes", comment?: string): Promise<any> {
+  async reviewRequirement(versionId: string, action: "approve" | "request_changes", comment?: string): Promise<unknown> {
     return apiFetch(`/requirements/${versionId}/review`, {
       method: "POST",
       body: JSON.stringify({ action, comment }),
@@ -354,5 +375,54 @@ export const api = {
 
   async seedDemoWorkspace() {
     return apiFetch("/system/seed-demo-workspace", { method: "POST" });
+  },
+
+  // Client
+  client: {
+    async getProjects() {
+      return apiFetch("/client/projects");
+    },
+
+    async getRequirementVersions(projectId: string) {
+      return apiFetch(`/client/projects/${projectId}/requirement-versions`);
+    },
+
+    async approveRequirementVersion(projectId: string, versionId: string, comment?: string) {
+      return apiFetch(`/client/projects/${projectId}/requirement-versions/${versionId}/approve`, {
+        method: "POST",
+        body: JSON.stringify({ comment }),
+      });
+    },
+
+    async rejectRequirementVersion(projectId: string, versionId: string, comment: string) {
+      return apiFetch(`/client/projects/${projectId}/requirement-versions/${versionId}/reject`, {
+        method: "POST",
+        body: JSON.stringify({ comment }),
+      });
+    },
+  },
+
+  // Notifications
+  notifications: {
+    async getAll() {
+      return apiFetch("/notifications");
+    },
+
+    async getUnreadCount() {
+      return apiFetch("/notifications/unread/count");
+    },
+
+    async markAsRead(id: string) {
+      return apiFetch(`/notifications/${id}`, {
+        method: "PATCH",
+        body: JSON.stringify({ is_read: true }),
+      });
+    },
+
+    async delete(id: string) {
+      return apiFetch(`/notifications/${id}`, {
+        method: "DELETE",
+      });
+    },
   },
 };

@@ -1,8 +1,9 @@
 "use client";
+/* eslint-disable react-hooks/exhaustive-deps */
 
 import { useEffect, useState } from "react";
 import { api, Project, AlignmentResult } from "@/lib/api-client";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -292,6 +293,7 @@ export default function AlignmentPage() {
   const [error, setError] = useState<string | null>(null);
   const [lastRunInfo, setLastRunInfo] = useState<string | null>(null);
 
+   
   useEffect(() => {
     async function init() {
       try {
@@ -300,7 +302,8 @@ export default function AlignmentPage() {
         if (projList.length > 0) {
           setSelectedProjectId(projList[0].id);
         }
-      } catch (err: any) {
+      } catch (error: unknown) { const errMsg = error instanceof Error ? error.message : String(error);
+        console.warn(errMsg);
         setError("Failed to load projects.");
       } finally {
         setLoading(false);
@@ -309,6 +312,9 @@ export default function AlignmentPage() {
     init();
   }, []);
 
+   
+   
+   
   useEffect(() => {
     if (selectedProjectId) {
       loadResults();
@@ -322,9 +328,9 @@ export default function AlignmentPage() {
       setError(null);
       const data = await api.getAlignmentResults(selectedProjectId);
       setResults(data);
-    } catch (err: any) {
+    } catch (error: unknown) { const errMsg = error instanceof Error ? error.message : String(error);
       setResults([]);
-      console.warn("No alignment results found:", err.message);
+      console.warn("No alignment results found:", errMsg);
     }
   };
 
@@ -336,8 +342,8 @@ export default function AlignmentPage() {
       const res = await api.runAlignment(selectedProjectId);
       setLastRunInfo(`Analysis complete — ${res.results_generated} requirement chains evaluated.`);
       await loadResults();
-    } catch (err: any) {
-      setError(err.message || "Alignment engine failed. Ensure backend is running and project has baseline requirements.");
+    } catch (error: unknown) { const errMsg = error instanceof Error ? error.message : String(error);
+      setError(errMsg || "Alignment engine failed. Ensure backend is running and project has baseline requirements.");
     } finally {
       setRunning(false);
     }

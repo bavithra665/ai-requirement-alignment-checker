@@ -5,7 +5,6 @@ import Link from "next/link";
 import { 
   Card, 
   CardContent, 
-  CardDescription, 
   CardHeader, 
   CardTitle 
 } from "@/components/ui/card";
@@ -66,8 +65,8 @@ export default function DashboardPage() {
       const data = await api.getProjects();
       setProjects(data);
       setError(null);
-    } catch (err: any) {
-      console.error(err);
+    } catch (error: unknown) { const errMsg = error instanceof Error ? error.message : String(error);
+      console.error(errMsg);
       setError("Failed to load projects. Ensure backend server is running.");
     } finally {
       setLoading(false);
@@ -103,8 +102,8 @@ export default function DashboardPage() {
       
       // Refresh
       fetchProjects();
-    } catch (err: any) {
-      alert(err.message || "Failed to create project");
+    } catch (error: unknown) { const errMsg = error instanceof Error ? error.message : String(error);
+      alert(errMsg || "Failed to create project");
     } finally {
       setSubmitting(false);
     }
@@ -118,8 +117,8 @@ export default function DashboardPage() {
       if (res.project && res.project.id) {
         router.push(`/projects/${res.project.id}`);
       }
-    } catch (err: any) {
-      alert(err.message || "Failed to seed demo workspace");
+    } catch (error: unknown) { const errMsg = error instanceof Error ? error.message : String(error);
+      alert(errMsg || "Failed to seed demo workspace");
     } finally {
       setSeedingDemo(false);
     }

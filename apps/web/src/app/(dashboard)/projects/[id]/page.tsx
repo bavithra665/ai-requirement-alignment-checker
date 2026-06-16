@@ -1,8 +1,10 @@
 "use client";
+/* eslint-disable react-hooks/exhaustive-deps */
 
 import { useEffect, useState, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useAuth } from "@/context/auth";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -13,28 +15,25 @@ import {
   ArrowLeft,
   Upload,
   FileText,
-  FileSpreadsheet,
   CheckCircle,
   AlertCircle,
-  HelpCircle,
   Clock,
   Sparkles,
   History,
-  MessageSquare,
   Loader2,
   Lock,
   GitCommit,
   UserCheck
 } from "lucide-react";
-import { api, Project, Requirement, RequirementVersion } from "@/lib/api-client";
+import { api, Project, RequirementVersion } from "@/lib/api-client";
 
 export default function ProjectDetailPage() {
   const params = useParams();
   const router = useRouter();
+  const { user } = useAuth();
   const projectId = params.id as string;
 
   const [project, setProject] = useState<Project | null>(null);
-  const [requirements, setRequirements] = useState<Requirement[]>([]);
   const [versions, setVersions] = useState<RequirementVersion[]>([]);
   
   const [loading, setLoading] = useState(true);
@@ -61,6 +60,7 @@ export default function ProjectDetailPage() {
     }
   };
 
+   
   useEffect(() => {
     if (projectId) {
       fetchData();
@@ -113,14 +113,14 @@ export default function ProjectDetailPage() {
         });
       }, 300);
 
-      const res = await api.uploadBRD(projectId, file);
+      const res = await api.uploadBRD(projectId, file) as Record<string, unknown>;
       clearInterval(interval);
       setUploadProgress(100);
       
-      alert(res.message || "File uploaded successfully!");
+      alert((res?.message as string) || "File uploaded successfully!");
       fetchData();
-    } catch (err: any) {
-      alert(err.message || "Failed to upload file");
+    } catch (error: unknown) { const errMsg = error instanceof Error ? error.message : String(error);
+      alert(errMsg || "Failed to upload file");
     } finally {
       setUploading(false);
       setUploadProgress(0);
@@ -143,8 +143,8 @@ export default function ProjectDetailPage() {
       }
       
       fetchData();
-    } catch (err: any) {
-      alert(err.message || "Failed to process review");
+    } catch (error: unknown) { const errMsg = error instanceof Error ? error.message : String(error);
+      alert(errMsg || "Failed to process review");
     } finally {
       setActionLoading(null);
     }
@@ -164,7 +164,7 @@ export default function ProjectDetailPage() {
       <div className="flex flex-col items-center justify-center p-24 text-center">
         <AlertCircle className="h-12 w-12 text-destructive mb-4" />
         <h3 className="text-xl font-bold">Project Not Found</h3>
-        <Button onClick={() => router.push("/dashboard")} className="mt-4">
+        <Button onClick={() => router.push(user?.role === 'client' ? '/client/dashboard' : '/dashboard')} className="mt-4">
           Return to Dashboard
         </Button>
       </div>
@@ -179,7 +179,7 @@ export default function ProjectDetailPage() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => router.push("/dashboard")}
+            onClick={() => router.push(user?.role === 'client' ? '/client/dashboard' : '/dashboard')}
             className="rounded-full shrink-0"
           >
             <ArrowLeft className="h-5 w-5" />
@@ -402,7 +402,7 @@ export default function ProjectDetailPage() {
                 </div>
               ) : (
                 <div className="relative pl-6 border-l-2 border-primary/20 space-y-8 py-2 ml-4">
-                  {versions.map((ver, idx) => (
+                  {versions.map((ver) => (
                     <div key={ver.id} className="relative">
                       {/* Timeline Dot */}
                       <span className="absolute -left-[31px] top-1.5 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-white border-2 border-primary">

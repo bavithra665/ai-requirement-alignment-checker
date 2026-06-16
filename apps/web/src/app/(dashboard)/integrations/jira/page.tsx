@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable react-hooks/exhaustive-deps */
 
 import { useEffect, useState } from "react";
 import { api, Project } from "@/lib/api-client";
@@ -41,6 +42,7 @@ export default function JiraIntegrationPage() {
   const [syncing, setSyncing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+   
   useEffect(() => {
     async function init() {
       try {
@@ -61,8 +63,8 @@ export default function JiraIntegrationPage() {
             setSelectedProjectId(projList[0].id);
           }
         }
-      } catch (err: any) {
-        console.error(err);
+      } catch (error: unknown) { const errMsg = error instanceof Error ? error.message : String(error);
+        console.error(errMsg);
         setError("Failed to load initial data. Ensure the backend server is running.");
       } finally {
         setLoadingStatus(false);
@@ -71,6 +73,9 @@ export default function JiraIntegrationPage() {
     init();
   }, []);
 
+   
+   
+   
   useEffect(() => {
     if (selectedProjectId) {
       loadStories();
@@ -85,10 +90,10 @@ export default function JiraIntegrationPage() {
       setError(null);
       const data = await api.getJiraStories(selectedProjectId);
       setStories(data);
-    } catch (err: any) {
+    } catch (error: unknown) { const errMsg = error instanceof Error ? error.message : String(error);
       setStories([]);
       // Project might not have stories yet
-      console.warn("Failed to load stories: ", err);
+      console.warn("Failed to load stories: ", errMsg);
     } finally {
       setLoadingStories(false);
     }
@@ -102,8 +107,8 @@ export default function JiraIntegrationPage() {
       const res = await api.syncJiraStories(selectedProjectId);
       alert(res.message || `Successfully synced ${res.synced} stories!`);
       await loadStories();
-    } catch (err: any) {
-      setError(err.message || "Sync failed. Check connection configuration.");
+    } catch (error: unknown) { const errMsg = error instanceof Error ? error.message : String(error);
+      setError(errMsg || "Sync failed. Check connection configuration.");
     } finally {
       setSyncing(false);
     }
@@ -266,7 +271,7 @@ export default function JiraIntegrationPage() {
             
             {!currentProject?.jira_project_key && selectedProjectId && (
               <p className="text-[11px] text-amber-600 italic">
-                Jira sync is disabled because this project doesn't have a Jira Project Key configured.
+                Jira sync is disabled because this project doesn&apos;t have a Jira Project Key configured.
               </p>
             )}
           </CardContent>

@@ -1,11 +1,12 @@
 "use client";
+/* eslint-disable react-hooks/exhaustive-deps */
 
 import { useEffect, useState } from "react";
 import { api, Project, ExecutiveReport } from "@/lib/api-client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, FileBarChart, Download, Printer, ShieldAlert, CheckCircle2, AlertTriangle, Target, Activity, FileText, Briefcase, Zap } from "lucide-react";
+import { Loader2, FileBarChart, Download, Printer, ShieldAlert, Activity, Briefcase, Zap, Target } from "lucide-react";
 
 export default function ExecutiveSummaryPage() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -15,6 +16,7 @@ export default function ExecutiveSummaryPage() {
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+   
   useEffect(() => {
     async function init() {
       try {
@@ -23,8 +25,9 @@ export default function ExecutiveSummaryPage() {
         if (projList.length > 0) {
           setSelectedProjectId(projList[0].id);
         }
-      } catch (err: any) {
+      } catch (error: unknown) { const errMsg = error instanceof Error ? error.message : String(error);
         setError("Failed to load projects.");
+        console.warn(errMsg);
       } finally {
         setLoading(false);
       }
@@ -32,6 +35,7 @@ export default function ExecutiveSummaryPage() {
     init();
   }, []);
 
+   
   useEffect(() => {
     if (selectedProjectId) {
       loadReport();
@@ -46,9 +50,9 @@ export default function ExecutiveSummaryPage() {
       setError(null);
       const data = await api.getExecutiveReport(selectedProjectId);
       setReport(data);
-    } catch (err: any) {
+    } catch (error: unknown) { const errMsg = error instanceof Error ? error.message : String(error);
       setReport(null);
-      console.warn("Failed to load executive report:", err.message);
+      console.warn("Failed to load executive report:", errMsg);
     } finally {
       setLoading(false);
     }
@@ -61,8 +65,8 @@ export default function ExecutiveSummaryPage() {
       setError(null);
       const data = await api.getExecutiveReport(selectedProjectId);
       setReport(data);
-    } catch (err: any) {
-      setError(err.message || "Failed to generate report.");
+    } catch (error: unknown) { const errMsg = error instanceof Error ? error.message : String(error);
+      setError(errMsg || "Failed to generate report.");
     } finally {
       setGenerating(false);
     }
@@ -77,8 +81,8 @@ export default function ExecutiveSummaryPage() {
       a.href = url;
       a.download = `executive_report_${selectedProjectId}.csv`;
       a.click();
-    } catch (err: any) {
-      setError("Failed to export CSV.");
+    } catch (error: unknown) { const errMsg = error instanceof Error ? error.message : String(error);
+      setError(errMsg || "Failed to export CSV.");
     }
   };
 

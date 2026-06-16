@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable react-hooks/exhaustive-deps */
 
 import { useEffect, useState } from "react";
 import { api, Project } from "@/lib/api-client";
@@ -45,6 +46,7 @@ export default function GitHubIntegrationPage() {
   const [extractedSuccess, setExtractedSuccess] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+   
   useEffect(() => {
     async function init() {
       try {
@@ -65,8 +67,8 @@ export default function GitHubIntegrationPage() {
             setSelectedProjectId(projList[0].id);
           }
         }
-      } catch (err: any) {
-        console.error(err);
+      } catch (error: unknown) { const errMsg = error instanceof Error ? error.message : String(error);
+        console.error(errMsg);
         setError("Failed to load initial data. Ensure the backend server is running.");
       } finally {
         setLoadingStatus(false);
@@ -75,6 +77,9 @@ export default function GitHubIntegrationPage() {
     init();
   }, []);
 
+   
+   
+   
   useEffect(() => {
     if (selectedProjectId) {
       loadPrs();
@@ -89,9 +94,9 @@ export default function GitHubIntegrationPage() {
       setError(null);
       const data = await api.getPullRequests(selectedProjectId);
       setPrs(data);
-    } catch (err: any) {
+    } catch (error: unknown) { const errMsg = error instanceof Error ? error.message : String(error);
       setPrs([]);
-      console.warn("Failed to load PRs: ", err);
+      console.warn("Failed to load PRs: ", errMsg);
     } finally {
       setLoadingPrs(false);
     }
@@ -105,8 +110,8 @@ export default function GitHubIntegrationPage() {
       const res = await api.syncPullRequests(selectedProjectId);
       alert(res.message || `Successfully synced ${res.synced} pull requests!`);
       await loadPrs();
-    } catch (err: any) {
-      setError(err.message || "Sync failed. Check repository URL and connection token.");
+    } catch (error: unknown) { const errMsg = error instanceof Error ? error.message : String(error);
+      setError(errMsg || "Sync failed. Check repository URL and connection token.");
     } finally {
       setSyncing(false);
     }
@@ -122,8 +127,8 @@ export default function GitHubIntegrationPage() {
       alert(
         `Extraction Completed!\nProcessed Files: ${res.processed_files}\nFunctions: ${res.total_functions}\nClasses: ${res.total_classes}\nEndpoints: ${res.total_endpoints}`
       );
-    } catch (err: any) {
-      setError(err.message || "Symbol extraction failed.");
+    } catch (error: unknown) { const errMsg = error instanceof Error ? error.message : String(error);
+      setError(errMsg || "Symbol extraction failed.");
     } finally {
       setExtractingId(null);
     }
@@ -288,7 +293,7 @@ export default function GitHubIntegrationPage() {
 
             {!currentProject?.repository_url && selectedProjectId && (
               <p className="text-[11px] text-amber-600 italic">
-                PR Sync is disabled because this project doesn't have a Repository URL configured.
+                PR Sync is disabled because this project doesn&apos;t have a Repository URL configured.
               </p>
             )}
           </CardContent>

@@ -3,7 +3,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { api, Project, ProjectHealth, MismatchReport } from "@/lib/api-client";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   Loader2,

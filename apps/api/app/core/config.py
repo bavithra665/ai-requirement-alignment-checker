@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     
     DATABASE_URL: str
     
-    CORS_ORIGINS: List[str] = ["http://localhost:3000"]
+    CORS_ORIGINS: List[str] = ["http://localhost:3000", "http://localhost:3001"]
     
     # Jira Integration (optional)
     JIRA_BASE_URL: Optional[str] = None
