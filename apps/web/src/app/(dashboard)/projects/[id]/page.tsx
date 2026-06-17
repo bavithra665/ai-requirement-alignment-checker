@@ -206,6 +206,13 @@ export default function ProjectDetailPage() {
                 </>
               )}
             </p>
+            {project.status_reason && (
+              <div className="mt-3 p-3 bg-muted/40 border border-muted rounded-md max-w-2xl">
+                <p className="text-sm text-muted-foreground">
+                  <strong className="text-foreground">Status Reason:</strong> {project.status_reason}
+                </p>
+              </div>
+            )}
           </div>
         </div>
 

@@ -89,7 +89,6 @@ export default function DashboardPage() {
         description: description || undefined,
         repository_url: repoUrl || undefined,
         jira_project_key: jiraKey || undefined,
-        status: "Draft",
       });
       
       // Reset form

@@ -9,7 +9,6 @@ class ProjectBase(BaseModel):
     description: Optional[str] = None
     repository_url: Optional[str] = None
     jira_project_key: Optional[str] = None
-    status: str = "Draft"
     owner_id: UUID
 
 class ProjectCreate(ProjectBase):
@@ -21,8 +20,8 @@ class ProjectUpdate(BaseModel):
     description: Optional[str] = None
     repository_url: Optional[str] = None
     jira_project_key: Optional[str] = None
-    status: Optional[str] = None
     owner_id: Optional[UUID] = None
 
 class ProjectResponse(ProjectBase, BaseDomainSchema):
-    pass
+    status: str
+    status_reason: str

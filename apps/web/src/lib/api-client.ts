@@ -8,7 +8,8 @@ export interface Project {
   description?: string;
   repository_url?: string;
   jira_project_key?: string;
-  status: "Draft" | "In Progress" | "Completed";
+  status: "Draft" | "In Progress" | "Completed" | string;
+  status_reason?: string;
   owner_id: string;
   created_at: string;
   updated_at: string;
@@ -210,7 +211,7 @@ export const api = {
     return apiFetch(`/projects/${id}`);
   },
 
-  async createProject(project: Omit<Project, "id" | "created_at" | "updated_at" | "owner_id"> & { owner_id?: string }): Promise<Project> {
+  async createProject(project: Omit<Project, "id" | "created_at" | "updated_at" | "owner_id" | "status" | "status_reason"> & { owner_id?: string }): Promise<Project> {
     // For MVP/Demo purposes, we'll try to find a user or use a dummy owner_id if not present
     let owner_id = project.owner_id;
     if (!owner_id) {

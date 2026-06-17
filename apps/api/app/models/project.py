@@ -11,9 +11,7 @@ class Project(Base, BaseDomainModel):
     client_name = Column(String, nullable=True)
     description = Column(Text, nullable=True)
     repository_url = Column(String, nullable=True)
-    jira_project_key = Column(String, nullable=True)
-    status = Column(String, default="Draft", nullable=False)
-    
+    jira_project_key = Column(String, nullable=True)    
     owner_id = Column(UUID(as_uuid=True), ForeignKey('users.id', ondelete='RESTRICT'), nullable=False, index=True)
 
     # Relationships
