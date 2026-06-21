@@ -44,7 +44,7 @@ class AlignmentViewSet(viewsets.ViewSet):
             'jira_story',
             'pull_request',
             'code_artifact',
-        ).order_by('-created_at')
+        ).order_by('requirement_version__requirement__title')
         serializer = AlignmentResultSerializer(results, many=True)
         return Response(serializer.data)
 

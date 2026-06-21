@@ -225,12 +225,12 @@ function MismatchRow({
             <Badge className={`${severityBadge(report.severity)} text-[10px] font-bold uppercase tracking-wider border`}>
               {report.severity}
             </Badge>
-            <span className="text-xs text-muted-foreground font-mono">
-              #{report.id.slice(0, 8)}
+            <span className="text-xs text-muted-foreground font-medium break-words">
+              {report.requirement_title || `#${report.id.slice(0, 8)}`}
             </span>
           </div>
-          <p className="text-sm font-medium text-foreground truncate">{report.mismatch_type}</p>
-          <p className="text-xs text-muted-foreground truncate max-w-[500px] mt-0.5">
+          <p className="text-sm font-medium text-foreground break-words">{report.mismatch_type}</p>
+          <p className="text-xs text-muted-foreground break-words mt-0.5">
             {report.description}
           </p>
         </div>

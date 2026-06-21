@@ -94,8 +94,8 @@ function AlignmentRow({ result }: { result: AlignmentResult }) {
         <div className="flex items-center gap-3 min-w-0">
           {statusIcon(result.alignment_status)}
           <div className="min-w-0">
-            <p className="text-sm font-semibold text-foreground truncate max-w-[320px]">
-              Requirement Version — Alignment #{result.id.slice(0, 8)}
+            <p className="text-sm font-semibold text-foreground break-words pr-4">
+              {result.requirement_title || `Requirement Version — Alignment #${result.id.slice(0, 8)}`}
             </p>
             <p className="text-xs text-muted-foreground">
               Confidence: {result.confidence}%
@@ -162,11 +162,11 @@ function AlignmentRow({ result }: { result: AlignmentResult }) {
 
               {/* Jira Story node */}
               <div className={`flex items-center gap-2 px-3 py-2 rounded-lg border w-full ${
-                result.jira_story_id ? "bg-sky-50 border-sky-100" : "bg-muted/30 border-dashed border-muted-foreground/20"
+                result.jira_story_title ? "bg-sky-50 border-sky-100" : "bg-muted/30 border-dashed border-muted-foreground/20"
               }`}>
-                <GitMerge className={`h-4 w-4 shrink-0 ${result.jira_story_id ? "text-sky-500" : "text-muted-foreground/30"}`} />
-                <span className={`text-xs font-semibold ${result.jira_story_id ? "text-sky-700" : "text-muted-foreground/50"}`}>
-                  {result.jira_story_id ? "Jira Story Linked" : "No Jira Story Found"}
+                <GitMerge className={`h-4 w-4 shrink-0 ${result.jira_story_title ? "text-sky-500" : "text-muted-foreground/30"}`} />
+                <span className={`text-xs font-semibold ${result.jira_story_title ? "text-sky-700" : "text-muted-foreground/50"} break-words`}>
+                  {result.jira_story_title ? result.jira_story_title : "No Jira Story Found"}
                 </span>
                 {result.requirement_jira_score !== undefined && result.requirement_jira_score !== null && (
                   <Badge className={`ml-auto text-[10px] ${
@@ -193,11 +193,11 @@ function AlignmentRow({ result }: { result: AlignmentResult }) {
 
               {/* Pull Request node */}
               <div className={`flex items-center gap-2 px-3 py-2 rounded-lg border w-full ${
-                result.pull_request_id ? "bg-violet-50 border-violet-100" : "bg-muted/30 border-dashed border-muted-foreground/20"
+                result.pull_request_title ? "bg-violet-50 border-violet-100" : "bg-muted/30 border-dashed border-muted-foreground/20"
               }`}>
-                <GitMerge className={`h-4 w-4 shrink-0 ${result.pull_request_id ? "text-violet-500" : "text-muted-foreground/30"}`} />
-                <span className={`text-xs font-semibold ${result.pull_request_id ? "text-violet-700" : "text-muted-foreground/50"}`}>
-                  {result.pull_request_id ? "Pull Request Linked" : "No Pull Request Found"}
+                <GitMerge className={`h-4 w-4 shrink-0 ${result.pull_request_title ? "text-violet-500" : "text-muted-foreground/30"}`} />
+                <span className={`text-xs font-semibold ${result.pull_request_title ? "text-violet-700" : "text-muted-foreground/50"} break-words`}>
+                  {result.pull_request_title ? result.pull_request_title : "No Pull Request Found"}
                 </span>
                 {result.jira_pr_score !== undefined && result.jira_pr_score !== null && (
                   <Badge className={`ml-auto text-[10px] ${
@@ -224,11 +224,11 @@ function AlignmentRow({ result }: { result: AlignmentResult }) {
 
               {/* Code Artifact node */}
               <div className={`flex items-center gap-2 px-3 py-2 rounded-lg border w-full ${
-                result.code_artifact_id ? "bg-teal-50 border-teal-100" : "bg-muted/30 border-dashed border-muted-foreground/20"
+                result.code_artifact_name ? "bg-teal-50 border-teal-100" : "bg-muted/30 border-dashed border-muted-foreground/20"
               }`}>
-                <Cpu className={`h-4 w-4 shrink-0 ${result.code_artifact_id ? "text-teal-500" : "text-muted-foreground/30"}`} />
-                <span className={`text-xs font-semibold ${result.code_artifact_id ? "text-teal-700" : "text-muted-foreground/50"}`}>
-                  {result.code_artifact_id ? "Code Artifact Linked" : "No Code Artifact Found"}
+                <Cpu className={`h-4 w-4 shrink-0 ${result.code_artifact_name ? "text-teal-500" : "text-muted-foreground/30"}`} />
+                <span className={`text-xs font-semibold ${result.code_artifact_name ? "text-teal-700" : "text-muted-foreground/50"} break-words`}>
+                  {result.code_artifact_name ? result.code_artifact_name : "No Code Artifact Found"}
                 </span>
                 {result.pr_artifact_score !== undefined && result.pr_artifact_score !== null && (
                   <Badge className={`ml-auto text-[10px] ${

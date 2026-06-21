@@ -70,6 +70,7 @@ export interface MismatchReport {
   id: string;
   project_id: string;
   alignment_result_id: string;
+  requirement_title?: string;
   mismatch_type: string;
   description: string;
   suggested_fix?: string;
