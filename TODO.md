@@ -1,0 +1,4 @@
+- [x] Remove undefined `setSelectedVersion` call from `apps/web/src/app/client/projects/[id]/page.tsx`.
+- [x] Optionally sort fetched requirement versions by `version_number` before setting state.
+- [ ] Run `pnpm` typecheck/lint/build to confirm compile success.
+- [ ] Sanity-check page behavior: versions load, AI summary shows, approve/reject works.
