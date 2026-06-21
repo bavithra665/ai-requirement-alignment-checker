@@ -203,6 +203,6 @@ class ClientProjectViewSet(viewsets.ViewSet):
         if not project:
             return Response({"detail": "Project not found."}, status=status.HTTP_404_NOT_FOUND)
             
-        versions = RequirementVersion.objects.filter(requirement__project=project, is_deleted=False).order_by('requirement__title')
+        versions = RequirementVersion.objects.filter(requirement__project=project, is_deleted=False).select_related('requirement').order_by('requirement__title')
         serializer = RequirementVersionSerializer(versions, many=True)
         return Response(serializer.data)

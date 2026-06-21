@@ -82,10 +82,18 @@ class ProjectSerializer(serializers.ModelSerializer):
 
 
 class RequirementVersionSerializer(serializers.ModelSerializer):
+    requirement_title = serializers.SerializerMethodField()
+
     class Meta:
         model = RequirementVersion
-        fields = ['id', 'requirement_id', 'version_number', 'content', 'change_summary', 'ai_summary', 'status', 'is_baseline', 'created_at', 'updated_at']
+        fields = ['id', 'requirement_id', 'requirement_title', 'version_number', 'content', 'change_summary', 'ai_summary', 'status', 'is_baseline', 'created_at', 'updated_at']
         read_only_fields = ['id', 'created_at', 'updated_at', 'requirement_id']
+
+    def get_requirement_title(self, obj):
+        try:
+            return obj.requirement.title
+        except Exception:
+            return None
 
 
 class RequirementSerializer(serializers.ModelSerializer):
