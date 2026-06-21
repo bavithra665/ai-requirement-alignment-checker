@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.urls import path, include
 from authentication.views import CookieTokenRefreshView
+from .views import SystemHealthView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -13,6 +14,7 @@ urlpatterns = [
     path('api/v1/', include('integrations.urls')),
     path('api/v1/', include('alignment.urls')),
     path('api/v1/', include('reporting.urls')),
+    path('api/v1/system/health', SystemHealthView.as_view(), name='system-health'),
 
     # Safety net: in case a running server instance has a different ROOT_URLCONF,
     # explicitly expose client requirement versions under /api/v1/... as used by the frontend.
