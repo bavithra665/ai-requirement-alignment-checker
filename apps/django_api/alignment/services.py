@@ -129,9 +129,9 @@ from integrations.models import JiraStory, PullRequest, CodeArtifact
 from .models import AlignmentResult
 
 def _score_to_status(score_pct: int) -> str:
-    if score_pct >= 75:
+    if score_pct == 100:
         return "Aligned"
-    elif score_pct >= 50:
+    elif score_pct >= 90:
         return "Potential Drift"
     return "Misaligned"
 
