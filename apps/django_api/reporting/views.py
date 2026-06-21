@@ -4,6 +4,8 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
+import csv
+from django.http import HttpResponse
 
 from .models import MismatchReport
 from .serializers import MismatchReportSerializer
@@ -71,3 +73,58 @@ class ReportingViewSet(viewsets.ViewSet):
         mismatch.save()
         serializer = MismatchReportSerializer(mismatch)
         return Response(serializer.data)
+
+    def export_mismatches_csv(self, request, project_id=None):
+        mismatches = MismatchReport.objects.filter(project_id=project_id, is_deleted=False).order_by('-created_at')
+        
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = f'attachment; filename="mismatches_{project_id}.csv"'
+        
+        writer = csv.writer(response)
+        writer.writerow([
+            "ID", "Type", "Severity", "Status", "Description", 
+            "Suggested Fix", "Resolution Notes", "Created At"
+        ])
+        
+        for r in mismatches:
+            writer.writerow([
+                str(r.id), r.mismatch_type, r.severity, r.status,
+                r.description, r.suggested_fix or "", 
+                r.resolution_notes or "", 
+                r.created_at.isoformat() if r.created_at else ""
+            ])
+            
+        return response
+
+    def export_executive_csv(self, request, project_id=None):
+        try:
+            report = reporting_service.get_executive_summary(project_id)
+            
+            response = HttpResponse(content_type='text/csv')
+            response['Content-Disposition'] = f'attachment; filename="executive_summary_{project_id}.csv"'
+            
+            writer = csv.writer(response)
+            writer.writerow(["Section", "Metric/Item", "Value"])
+            
+            # Summary
+            writer.writerow(["Project Summary", "Name", report["project_summary"]["name"]])
+            writer.writerow(["Project Summary", "Client", report["project_summary"]["client_name"]])
+            writer.writerow(["Project Summary", "Status", report["project_summary"]["status"]])
+            
+            # Health
+            writer.writerow(["Project Health", "Score", str(report["health"]["health_score"])])
+            writer.writerow(["Project Health", "Status", report["health"]["health_status"]])
+            writer.writerow(["Project Health", "Drift %", str(report["health"]["drift_percentage"])])
+            
+            # Top Risks
+            for i, risk in enumerate(report["top_risks"]):
+                writer.writerow([f"Top Risk #{i+1}", risk["mismatch_type"], f"{risk['severity']} - {risk['description']}"])
+                
+            # Narrative
+            writer.writerow(["Narrative Summary", "AI Explanation", report["narrative"]])
+            writer.writerow(["Recommendations", "Action Items", ", ".join(report["recommendations"]) if isinstance(report["recommendations"], list) else report["recommendations"]])
+            
+            return response
+        except Exception as e:
+            return Response({"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
