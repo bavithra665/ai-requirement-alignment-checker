@@ -20,10 +20,49 @@ class ProjectSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'created_at', 'updated_at', 'owner_id', 'status', 'status_reason', 'client_user_id']
 
     def get_status(self, obj):
-        return "Draft"
+        reqs = obj.requirements.filter(is_deleted=False)
+        if not reqs.exists():
+            return "Draft"
+            
+        has_approved = False
+        all_aligned = True
+        has_any_alignment = False
+        
+        try:
+            from alignment.models import AlignmentResult
+        except ImportError:
+            return "Draft"
+            
+        for req in reqs:
+            approved_versions = req.versions.filter(status="Approved", is_deleted=False)
+            if approved_versions.exists():
+                has_approved = True
+                for version in approved_versions:
+                    alignments = AlignmentResult.objects.filter(requirement_version=version, is_deleted=False)
+                    if not alignments.exists():
+                        all_aligned = False
+                    else:
+                        for alignment in alignments:
+                            has_any_alignment = True
+                            if alignment.overall_alignment_score < 100:
+                                all_aligned = False
+                                
+        if not has_approved:
+            return "Draft"
+            
+        if has_any_alignment and all_aligned:
+            return "Completed"
+            
+        return "In Progress"
 
     def get_status_reason(self, obj):
-        return "No approved baseline requirements exist"
+        status = self.get_status(obj)
+        if status == "Draft":
+            return "Awaiting BRD / requirement baseline"
+        elif status == "Completed":
+            return "All requirements fully aligned"
+        else:
+            return "Requirements being implemented"
 
     def validate(self, data):
         client_email = data.get('client_email')
