@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { 
   Card, 
@@ -37,8 +37,7 @@ import {
   ExternalLink,
   Code2,
   CheckCircle2,
-  AlertCircle,
-  Sparkles
+  AlertCircle
 } from "lucide-react";
 import { api, Project } from "@/lib/api-client";
 import { useRouter } from "next/navigation";
@@ -48,16 +47,17 @@ export default function DashboardPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [seedingDemo, setSeedingDemo] = useState(false);
 
   // Form State
   const [name, setName] = useState("");
   const [clientName, setClientName] = useState("");
+  const [clientEmail, setClientEmail] = useState("");
   const [description, setDescription] = useState("");
   const [repoUrl, setRepoUrl] = useState("");
   const [jiraKey, setJiraKey] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [formError, setFormError] = useState("");
 
   const fetchProjects = async () => {
     try {
@@ -80,12 +80,14 @@ export default function DashboardPage() {
   const handleCreateProject = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
+    setFormError("");
 
     try {
       setSubmitting(true);
       await api.createProject({
         name,
         client_name: clientName || undefined,
+        client_email: clientEmail || undefined,
         description: description || undefined,
         repository_url: repoUrl || undefined,
         jira_project_key: jiraKey || undefined,
@@ -94,32 +96,20 @@ export default function DashboardPage() {
       // Reset form
       setName("");
       setClientName("");
+      setClientEmail("");
       setDescription("");
       setRepoUrl("");
       setJiraKey("");
+      setFormError("");
       setIsDialogOpen(false);
       
       // Refresh
       fetchProjects();
-    } catch (error: unknown) { const errMsg = error instanceof Error ? error.message : String(error);
-      alert(errMsg || "Failed to create project");
+    } catch (error: unknown) {
+      const errMsg = error instanceof Error ? error.message : String(error);
+      setFormError(errMsg || "Failed to create project");
     } finally {
       setSubmitting(false);
-    }
-  };
-
-  const handleSeedDemo = async () => {
-    try {
-      setSeedingDemo(true);
-      const res = await api.seedDemoWorkspace();
-      await fetchProjects();
-      if (res.project && res.project.id) {
-        router.push(`/projects/${res.project.id}`);
-      }
-    } catch (error: unknown) { const errMsg = error instanceof Error ? error.message : String(error);
-      alert(errMsg || "Failed to seed demo workspace");
-    } finally {
-      setSeedingDemo(false);
     }
   };
 
@@ -140,15 +130,6 @@ export default function DashboardPage() {
         </div>
 
         <div className="flex gap-2">
-          <Button 
-            variant="outline" 
-            className="border-primary text-primary hover:bg-primary/10"
-            onClick={handleSeedDemo}
-            disabled={seedingDemo}
-          >
-            {seedingDemo ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
-            Create Demo Workspace
-          </Button>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger>
               <div className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-2 bg-primary hover:bg-secondary text-white shadow-md cursor-pointer">
@@ -185,6 +166,18 @@ export default function DashboardPage() {
                   />
                 </div>
                 <div className="grid gap-2">
+                  <Label htmlFor="clientEmail">Client Email *</Label>
+                  <Input 
+                    id="clientEmail" 
+                    type="email"
+                    placeholder="client@company.com" 
+                    value={clientEmail} 
+                    onChange={e => setClientEmail(e.target.value)} 
+                    required
+                  />
+                  <p className="text-xs text-muted-foreground">Must be a registered client account email</p>
+                </div>
+                <div className="grid gap-2">
                   <Label htmlFor="description">Description</Label>
                   <Input 
                     id="description" 
@@ -214,6 +207,9 @@ export default function DashboardPage() {
                   </div>
                 </div>
               </div>
+              {formError && (
+                <p className="text-sm text-destructive mb-2">{formError}</p>
+              )}
               <DialogFooter>
                 <Button 
                   type="button" 

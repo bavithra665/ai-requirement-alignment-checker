@@ -199,6 +199,9 @@ export default function ProjectDetailPage() {
             </div>
             <p className="text-muted-foreground text-sm">
               Client: <span className="font-semibold text-foreground">{project.client_name || "Internal"}</span>
+              {project.client_email && (
+                <span className="ml-2 text-xs text-muted-foreground">({project.client_email})</span>
+              )}
               {project.jira_project_key && (
                 <>
                   <span className="mx-2">•</span>
