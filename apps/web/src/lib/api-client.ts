@@ -1,10 +1,12 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8001";
 const API_V1 = `${API_BASE_URL}/api/v1`;
 
 export interface Project {
   id: string;
   name: string;
   client_name?: string;
+  client_email?: string;
+  client_user_id?: string;
   description?: string;
   repository_url?: string;
   jira_project_key?: string;
@@ -43,6 +45,14 @@ export interface AlignmentResult {
   jira_story_id?: string;
   pull_request_id?: string;
   code_artifact_id?: string;
+
+  // Human-readable chain labels returned by backend
+  requirement_title?: string;
+  jira_story_title?: string;
+  pull_request_title?: string;
+  code_artifact_name?: string;
+  code_artifact_path?: string;
+
   requirement_jira_score?: number;
   jira_pr_score?: number;
   pr_artifact_score?: number;
@@ -133,25 +143,44 @@ async function apiFetch(endpoint: string, options: RequestInit = {}) {
     return fetch(url, {
       ...options,
       headers: requestHeaders,
-      credentials: "omit",
+      credentials: "include",
     });
   }
 
   let response = await executeFetch(!!token);
 
-  if (response.status === 401) {
-    const errorJson = await response.json().catch(() => null);
-    const errorDetail = errorJson?.detail || "API Request failed";
-
-    if (typeof window !== "undefined") {
-      localStorage.removeItem("token");
+  if (response.status === 401 && token) {
+    // Token might be expired — try to refresh it
+    try {
+      const refreshToken = typeof window !== "undefined" ? localStorage.getItem("refreshToken") : null;
+      if (refreshToken) {
+        const refreshResponse = await fetch(`${API_V1}/auth/token/refresh`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ refresh: refreshToken }),
+        });
+        if (refreshResponse.ok) {
+          const refreshData = await refreshResponse.json();
+          if (refreshData.access) {
+            localStorage.setItem("token", refreshData.access);
+            headers.set("Authorization", `Bearer ${refreshData.access}`);
+            response = await executeFetch(true);
+          }
+        }
+      }
+    } catch {
+      // Refresh failed — fall through to error handling below
     }
 
-    if (token) {
-      response = await executeFetch(false);
-    } else {
-      throw new Error(errorDetail);
+    if (response.status === 401) {
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("token");
+        localStorage.removeItem("refreshToken");
+      }
+      throw new Error("Session expired. Please log in again.");
     }
+  } else if (response.status === 401) {
+    throw new Error("Authentication credentials were not provided.");
   }
 
   if (!response.ok) {
@@ -179,6 +208,9 @@ export const api = {
     if (data.access_token) {
       localStorage.setItem("token", data.access_token);
     }
+    if (data.refresh_token) {
+      localStorage.setItem("refreshToken", data.refresh_token);
+    }
     return data;
   },
 
@@ -195,6 +227,7 @@ export const api = {
 
   async logout() {
     localStorage.removeItem("token");
+    localStorage.removeItem("refreshToken");
     try {
       return await apiFetch("/auth/logout", { method: "POST" });
     } catch (error: unknown) { void error; 
@@ -321,7 +354,7 @@ export const api = {
   // ── Reports & Insights ────────────────────────────────────────────────────
 
   async generateMismatchReports(projectId: string) {
-    return apiFetch(`/reports/mismatches/generate/${projectId}`, { method: "POST" });
+    return apiFetch(`/reporting/mismatches/generate/${projectId}`, { method: "POST" });
   },
 
   async getMismatchReports(projectId: string, status?: string, severity?: string): Promise<MismatchReport[]> {
@@ -329,22 +362,22 @@ export const api = {
     if (status) params.set("status", status);
     if (severity) params.set("severity", severity);
     const qs = params.toString();
-    return apiFetch(`/reports/mismatches/${projectId}${qs ? `?${qs}` : ""}`);
+    return apiFetch(`/reporting/mismatches/${projectId}${qs ? `?${qs}` : ""}`);
   },
 
   async updateMismatchReport(mismatchId: string, data: { status?: string; resolution_notes?: string }) {
-    return apiFetch(`/reports/mismatches/${mismatchId}`, {
+    return apiFetch(`/reporting/mismatch/${mismatchId}/resolve`, {
       method: "PATCH",
       body: JSON.stringify(data),
     });
   },
 
   async getProjectHealth(projectId: string): Promise<ProjectHealth> {
-    return apiFetch(`/reports/health/${projectId}`);
+    return apiFetch(`/reporting/risk-dashboard/${projectId}`);
   },
 
   async getExecutiveReport(projectId: string): Promise<ExecutiveReport> {
-    return apiFetch(`/reports/executive/${projectId}`);
+    return apiFetch(`/reporting/executive-summary/${projectId}`);
   },
 
   async exportMismatchesCsv(projectId: string) {
@@ -372,10 +405,6 @@ export const api = {
   // System
   async getSystemHealth() {
     return apiFetch("/system/health");
-  },
-
-  async seedDemoWorkspace() {
-    return apiFetch("/system/seed-demo-workspace", { method: "POST" });
   },
 
   // Client
