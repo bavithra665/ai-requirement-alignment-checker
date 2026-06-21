@@ -68,9 +68,6 @@ export default function ApprovalsPage() {
             <p>{approval.comment}</p>
           </div>
         )}
-        <Button variant="outline" className="w-full">
-          View Version Details
-        </Button>
       </CardContent>
     </Card>
   );

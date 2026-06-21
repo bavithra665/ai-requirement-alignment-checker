@@ -101,7 +101,7 @@ class RequirementViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'], url_path='approvals')
     def all_approvals(self, request):
-        versions = RequirementVersion.objects.filter(is_deleted=False).order_by('-updated_at')
+        versions = RequirementVersion.objects.filter(is_deleted=False).order_by('requirement__title')
         
         results = []
         for v in versions:
