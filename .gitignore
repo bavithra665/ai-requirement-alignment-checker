@@ -3,6 +3,8 @@ node_modules/
 __pycache__/
 apps/api/chroma_db/
 apps/api/.venv/
+apps/django_api/chroma_db/
+apps/django_api/.venv/
 apps/web/.next/
 *.pyc
 *.db
@@ -12,3 +14,7 @@ htmlcov/
 dist/
 build/
 *.egg-info/
+tmp_token.txt
+*.docx
+*.pdf
+checkpoint_page.tsx

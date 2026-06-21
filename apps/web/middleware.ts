@@ -12,7 +12,7 @@ export async function middleware(request: NextRequest) {
   if (token && isAuthPage) {
     // Attempt to resolve role from backend using the access token
     try {
-      const backendUrl = process.env.BACKEND_URL || 'http://localhost:8000'
+      const backendUrl = process.env.BACKEND_URL || 'http://localhost:8001'
       const resp = await fetch(`${backendUrl}/api/v1/auth/me`, {
         headers: {
           Authorization: `Bearer ${token}`,
