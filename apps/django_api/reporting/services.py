@@ -238,12 +238,8 @@ class ReportingService:
         api_key = os.getenv("GROQ_API_KEY", "")
         if not api_key:
             return (
-                f"Project '{project_summary.get('name', 'N/A')}' has a health score of "
-                f"{health.get('health_score', 'N/A')}% ({health.get('health_status', 'N/A')}). "
-                f"There are {alignment_overview.get('total', 0)} alignment results with "
-                f"an average score of {alignment_overview.get('avg_score', 0)}%. "
-                f"{health.get('open_mismatches', 0)} open mismatches require attention. "
-                f"(Enable GROQ_API_KEY for AI-generated executive narrative.)"
+                f"Project '{project_summary.get('name', 'N/A')}' health: "
+                f"{health.get('health_score', 'N/A')}% ({health.get('health_status', 'N/A')})."
             )
 
         try:
@@ -280,8 +276,7 @@ Write professionally. Focus on impact, trends, and actionable insights. Do NOT i
         except Exception as exc:
             return (
                 f"Project '{project_summary.get('name', 'N/A')}' health: "
-                f"{health.get('health_score', 'N/A')}% ({health.get('health_status', 'N/A')}). "
-                f"(AI narrative unavailable.)"
+                f"{health.get('health_score', 'N/A')}% ({health.get('health_status', 'N/A')})."
             )
 
     def _generate_recommendations(

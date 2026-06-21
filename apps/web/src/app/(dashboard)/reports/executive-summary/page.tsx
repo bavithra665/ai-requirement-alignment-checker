@@ -258,7 +258,7 @@ export default function ExecutiveSummaryPage() {
               AI Executive Summary
             </h3>
             <div className="prose prose-slate max-w-none text-slate-700 leading-relaxed bg-indigo-50/50 p-6 rounded-xl border border-indigo-100">
-              {report.narrative.split('\n\n').map((paragraph, idx) => (
+              {(report.narrative || '').split('\n\n').map((paragraph, idx) => (
                 <p key={idx} className={idx > 0 ? "mt-4" : ""}>{paragraph}</p>
               ))}
             </div>
@@ -272,12 +272,19 @@ export default function ExecutiveSummaryPage() {
             </h3>
             <div className="bg-amber-50/50 p-6 rounded-xl border border-amber-100">
               <ul className="space-y-3">
-                {report.recommendations.split('\n').filter(line => line.trim().length > 0).map((rec, idx) => (
-                  <li key={idx} className="flex gap-3 text-slate-700">
-                    <span className="text-amber-500 font-bold mt-0.5">•</span>
-                    <span>{rec.replace(/^[-\*\d\.\s]+/, '')}</span>
-                  </li>
-                ))}
+                {(Array.isArray(report.recommendations)
+                  ? report.recommendations
+                  : typeof report.recommendations === 'string'
+                  ? report.recommendations.split('\n')
+                  : []
+                )
+                  .filter(line => line && typeof line === 'string' && line.trim().length > 0)
+                  .map((rec, idx) => (
+                    <li key={idx} className="flex gap-3 text-slate-700">
+                      <span className="text-amber-500 font-bold mt-0.5">•</span>
+                      <span>{rec.replace(/^[-\*\d\.\s]+/, '')}</span>
+                    </li>
+                  ))}
               </ul>
             </div>
           </div>

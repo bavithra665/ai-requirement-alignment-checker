@@ -118,7 +118,7 @@ export interface ExecutiveReport {
   }>;
   health: ProjectHealth;
   narrative: string;
-  recommendations: string;
+  recommendations: string | string[];
 }
 
 // Fetch helper that automatically includes cookies/headers
