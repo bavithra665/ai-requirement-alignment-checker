@@ -105,6 +105,7 @@ export default function ClientProjectPage() {
 
   const handleReject = async () => {
     if (!selectedVersion) return;
+
     setIsSubmitting(true);
     setError("");
     try {
@@ -115,6 +116,7 @@ export default function ClientProjectPage() {
       await loadVersions();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to request changes");
+      throw err;
     } finally {
       setIsSubmitting(false);
     }
@@ -264,13 +266,47 @@ export default function ClientProjectPage() {
                 {/* Action Section */}
                 {selectedVersion.status === "Approved" ? (
                   <div className="px-6 py-5 bg-white">
-                    <div className="flex items-center gap-3 p-4 bg-emerald-50 border border-emerald-200 rounded-xl">
-                      <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0" />
-                      <div>
+                    <div className="flex items-start gap-3 p-4 bg-emerald-50 border border-emerald-200 rounded-xl">
+                      <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
+                      <div className="flex-1">
                         <p className="font-semibold text-emerald-800 text-sm">Already Approved</p>
                         <p className="text-xs text-emerald-700 mt-0.5">
-                          This requirement has been approved and locked as a production baseline.
+                          This requirement has been approved and locked as a production baseline. If you need changes, request them below.
                         </p>
+
+                        <div className="mt-4 space-y-4">
+                          <div>
+                            <label htmlFor="comment" className="block text-xs font-semibold text-muted-foreground mb-1.5">
+                              Comment (Required for request)
+                            </label>
+                            <textarea
+                              id="comment"
+                              placeholder="Explain what changes you need..."
+                              value={comment}
+                              onChange={(e) => setComment(e.target.value)}
+                              rows={3}
+                              className="w-full px-3 py-2.5 rounded-xl border border-gray-200 bg-white text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/50 outline-none resize-none transition-all"
+                            />
+                          </div>
+
+                          <div className="flex gap-3">
+                            <Button
+                              onClick={async () => {
+                                await handleReject();
+                              }}
+                              disabled={isSubmitting}
+                              variant="outline"
+                              className="flex-1 border-amber-400 text-amber-700 hover:bg-amber-50 font-semibold rounded-xl h-10"
+                            >
+                              {isSubmitting ? (
+                                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                              ) : (
+                                <XCircle className="h-4 w-4 mr-2" />
+                              )}
+                              Request Changes
+                            </Button>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>

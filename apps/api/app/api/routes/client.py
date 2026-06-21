@@ -193,13 +193,13 @@ async def reject_requirement_version(
     if not approval:
         approval = ClientApproval(
             requirement_version_id=version_id,
-            status="rejected",
+            status="requested_changes",
             comments=comment_text,
             created_by_id=current_user.id,
             updated_by_id=current_user.id
         )
     else:
-        approval.status = "rejected"
+        approval.status = "requested_changes"
         approval.comments = comment_text
         approval.updated_by_id = current_user.id
 
