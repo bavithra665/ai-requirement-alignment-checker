@@ -72,17 +72,30 @@ export default function ExecutiveSummaryPage() {
     }
   };
 
-  const handleExportCsv = async () => {
-    if (!selectedProjectId) return;
+  const handleExportPdf = async () => {
+    if (!selectedProjectId || !report) return;
     try {
-      const blob = await api.exportExecutiveCsv(selectedProjectId);
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `executive_report_${selectedProjectId}.csv`;
-      a.click();
-    } catch (error: unknown) { const errMsg = error instanceof Error ? error.message : String(error);
-      setError(errMsg || "Failed to export CSV.");
+      setGenerating(true);
+      setError(null);
+      // @ts-ignore
+      const html2PDF = (await import("jspdf-html2canvas")).default;
+      const element = document.getElementById("report-content");
+      if (!element) return;
+
+      await html2PDF(element, {
+        jsPDF: {
+          unit: "mm",
+          format: "a4",
+          orientation: "portrait"
+        },
+        imageType: "image/jpeg",
+        output: `executive_report_${selectedProjectId}.pdf`
+      });
+    } catch (error: unknown) {
+      const errMsg = error instanceof Error ? error.message : String(error);
+      setError(errMsg || "Failed to export PDF.");
+    } finally {
+      setGenerating(false);
     }
   };
 
@@ -152,11 +165,11 @@ export default function ExecutiveSummaryPage() {
           
           <Button
             variant="outline"
-            onClick={handleExportCsv}
+            onClick={handleExportPdf}
             disabled={!report}
             className="flex items-center gap-2"
           >
-            <Download className="h-4 w-4" /> CSV
+            <Download className="h-4 w-4" /> PDF
           </Button>
 
           <Button
@@ -165,7 +178,7 @@ export default function ExecutiveSummaryPage() {
             disabled={!report}
             className="flex items-center gap-2"
           >
-            <Printer className="h-4 w-4" /> PDF
+            <Printer className="h-4 w-4" /> Print
           </Button>
         </div>
       </div>
@@ -195,7 +208,7 @@ export default function ExecutiveSummaryPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="space-y-8 bg-white p-2 md:p-8 rounded-xl print:p-0 print:bg-transparent">
+        <div id="report-content" className="space-y-8 bg-white p-2 md:p-8 rounded-xl print:p-0 print:bg-transparent">
           
           {/* Report Header */}
           <div className="border-b pb-6">

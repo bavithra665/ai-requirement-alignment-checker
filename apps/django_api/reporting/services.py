@@ -343,6 +343,6 @@ Be specific and actionable. Do NOT invent data not provided above."""
                     cleaned.append(line)
             return cleaned if cleaned else ["No specific recommendations generated."]
         except Exception as exc:
-            return ["Review open mismatch reports and address critical alignment gaps. (AI recommendations unavailable.)"]
+            return ["Review open mismatch reports and address critical alignment gaps."]
 
 reporting_service = ReportingService()
