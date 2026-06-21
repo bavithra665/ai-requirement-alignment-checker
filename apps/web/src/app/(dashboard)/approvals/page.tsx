@@ -13,7 +13,7 @@ interface ApprovalRequest {
   status: "pending" | "approved" | "rejected" | "requested_changes";
   clientName: string;
   comment?: string;
-  createdAt: string;
+  createdAt?: string;
 }
 
 export default function ApprovalsPage() {
@@ -62,12 +62,27 @@ export default function ApprovalsPage() {
         </div>
       </CardHeader>
       <CardContent>
-        {approval.comment && (
-          <div className="bg-muted p-3 rounded-md mb-4 text-sm">
-            <p className="font-medium mb-1">Comment:</p>
-            <p>{approval.comment}</p>
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            {approval.comment && (
+              <div className="bg-muted p-3 rounded-md mb-4 text-sm">
+                <p className="font-medium mb-1">Comment:</p>
+                <p>{approval.comment}</p>
+              </div>
+            )}
           </div>
-        )}
+          {approval.createdAt && (
+            <div className="shrink-0 text-xs text-muted-foreground whitespace-nowrap">
+              Requested: {new Date(approval.createdAt).toLocaleString(undefined, {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+            </div>
+          )}
+        </div>
       </CardContent>
     </Card>
   );
