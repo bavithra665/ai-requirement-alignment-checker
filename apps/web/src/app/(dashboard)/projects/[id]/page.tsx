@@ -235,7 +235,7 @@ export default function ProjectDetailPage() {
       {/* Tabs Command Center */}
       <Tabs defaultValue="upload" className="w-full">
         <TabsList className="grid w-full grid-cols-4 glass border p-1 rounded-lg">
-          <TabsTrigger value="upload" className="font-semibold">BRD Upload & Extract</TabsTrigger>
+          <TabsTrigger value="upload" className="font-semibold">Upload Requirements</TabsTrigger>
           <TabsTrigger value="summary" className="font-semibold">AI Executive Summary</TabsTrigger>
           <TabsTrigger value="versions" className="font-semibold">Version History</TabsTrigger>
           <TabsTrigger value="review" className="font-semibold">Client Review</TabsTrigger>
@@ -247,9 +247,15 @@ export default function ProjectDetailPage() {
             {/* Upload Zone */}
             <Card className="glass md:col-span-1 border border-white/20">
               <CardHeader>
-                <CardTitle className="text-lg">Upload BRD Document</CardTitle>
-                <CardDescription>
-                  Upload your Business Requirement Document (PDF or DOCX) to extract and baseline development tracks.
+                <CardTitle className="text-lg">Upload REQUIREMENTS</CardTitle>
+                <CardDescription className="space-y-2">
+                  <p>Upload your requirement Document (PDF or DOCX) to extract and baseline development tracks.</p>
+                  <div className="mt-2 p-2 bg-muted/40 rounded-md text-xs font-mono text-muted-foreground border border-muted">
+                    <p className="font-semibold text-foreground mb-1">format of requirements is</p>
+                    REQ-001: User Login Functionality<br/>
+                    REQ-002: User Registration Functionality<br/>
+                    REQ-003: .........
+                  </div>
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
