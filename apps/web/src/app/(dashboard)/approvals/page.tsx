@@ -5,6 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { AlertCircle, CheckCircle, XCircle, Clock } from "lucide-react";
 
+import { api } from "@/lib/api-client";
+
 interface ApprovalRequest {
   id: string;
   title: string;
@@ -28,12 +30,11 @@ export default function ApprovalsPage() {
   const loadApprovals = async () => {
     try {
       setIsLoading(true);
-      // TODO: Fetch actual approval data from API
-      // This is a placeholder structure
-      setPending([]);
-      setRequested([]);
-      setRejected([]);
-      setApproved([]);
+      const data: ApprovalRequest[] = await api.getApprovals();
+      setPending(data.filter((a) => a.status === "pending"));
+      setRequested(data.filter((a) => a.status === "requested_changes"));
+      setRejected(data.filter((a) => a.status === "rejected"));
+      setApproved(data.filter((a) => a.status === "approved"));
     } catch (error) {
       console.error("Failed to load approvals:", error);
     } finally {

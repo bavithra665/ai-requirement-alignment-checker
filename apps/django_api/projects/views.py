@@ -99,6 +99,38 @@ class RequirementViewSet(viewsets.ModelViewSet):
         serializer = RequirementVersionSerializer(versions, many=True)
         return Response(serializer.data)
 
+    @action(detail=False, methods=['get'], url_path='approvals')
+    def all_approvals(self, request):
+        versions = RequirementVersion.objects.filter(is_deleted=False).order_by('-updated_at')
+        
+        results = []
+        for v in versions:
+            # Map Django status to frontend status
+            frontend_status = "pending"
+            if v.status == "Approved":
+                frontend_status = "approved"
+            elif v.status == "Changes Requested":
+                frontend_status = "requested_changes"
+            elif v.status == "Rejected":
+                frontend_status = "rejected"
+            elif v.status == "Draft":
+                frontend_status = "pending"
+                
+            approval = v.approvals.order_by('-created_at').first()
+            comment = approval.comments if approval else ""
+            client_name = v.requirement.project.client_name or "Internal"
+            
+            results.append({
+                "id": str(v.id),
+                "title": f"{v.requirement.title} (v{v.version_number}.0)",
+                "status": frontend_status,
+                "clientName": client_name,
+                "comment": comment,
+                "createdAt": v.created_at.isoformat(),
+            })
+            
+        return Response(results)
+
 class ClientApprovalViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
 

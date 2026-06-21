@@ -297,6 +297,10 @@ export const api = {
     });
   },
 
+  async getApprovals(): Promise<any[]> {
+    return apiFetch("/requirements/approvals");
+  },
+
   // Jira Integration
   async getJiraStatus() {
     return apiFetch("/jira/status");
