@@ -43,7 +43,7 @@ export default function LoginPage() {
       await api.login(formData);
 
       // Get user info to check role
-      const response = await fetch("http://localhost:8000/api/v1/auth/me", {
+      const response = await fetch("http://localhost:8001/api/v1/auth/me", {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -195,11 +195,11 @@ export default function LoginPage() {
                   </div>
                 )}
                 <div className="grid gap-2">
-                  <Label htmlFor="email" className="text-slate-700 font-medium">Email</Label>
+                  <Label htmlFor="email" className="text-slate-700 font-medium">Username or Email</Label>
                   <Input
                     id="email"
-                    type="email"
-                    placeholder="name@example.com"
+                    type="text"
+                    placeholder="Enter username or email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required

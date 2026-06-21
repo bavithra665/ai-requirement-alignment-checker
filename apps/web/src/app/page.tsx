@@ -18,7 +18,7 @@ export default function Home() {
       // User is logged in, redirect to appropriate dashboard
       const checkRole = async () => {
         try {
-          const response = await fetch("http://localhost:8000/api/v1/auth/me", {
+          const response = await fetch("http://localhost:8001/api/v1/auth/me", {
             headers: {
               Authorization: `Bearer ${token}`,
             },
