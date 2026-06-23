@@ -2,9 +2,55 @@
 
 import { ReactNode, useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { FileCheck2, LogOut, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/auth";
+
+const ELetter = () => (
+  <span className="inline-flex flex-col justify-between h-[11px] w-[8.5px] py-[0.75px] mx-[0.5px] shrink-0 align-middle">
+    <span className="h-[2px] w-full bg-current rounded-[1px]"></span>
+    <span className="h-[2px] w-full bg-current rounded-[1px]"></span>
+    <span className="h-[2px] w-full bg-current rounded-[1px]"></span>
+  </span>
+);
+
+const PinesphereBrand = () => (
+  <div className="flex items-center gap-2.5 select-none">
+    <div 
+      className="h-10 w-10 shrink-0 rounded-md shadow-sm" 
+      style={{
+        backgroundImage: "url('/pinesphere-logo.png')",
+        backgroundRepeat: "no-repeat",
+        backgroundPosition: "center -3px",
+        backgroundSize: "155% auto"
+      }}
+    />
+    <div className="hidden sm:flex items-center gap-2 leading-none">
+      <span className="font-extrabold tracking-widest text-[15px] uppercase flex items-center shrink-0">
+        <span className="text-[#3792d7] flex items-center">
+          <span>P</span>
+          <span>I</span>
+          <span>N</span>
+          <ELetter />
+        </span>
+        <span className="text-slate-800 flex items-center ml-[2px]">
+          <span>S</span>
+          <span>P</span>
+          <span>H</span>
+          <ELetter />
+          <span>R</span>
+          <ELetter />
+        </span>
+      </span>
+      <span className="h-5 w-[1px] bg-slate-200 shrink-0" />
+      <div className="flex flex-col text-[9px] font-bold text-slate-500 uppercase tracking-wider leading-tight shrink-0">
+        <span>Requirement</span>
+        <span>To Implementation</span>
+      </div>
+    </div>
+  </div>
+);
 
 export default function ClientLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
@@ -32,12 +78,9 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
     <div className="flex min-h-screen w-full flex-col bg-muted/40">
       {/* Topbar */}
       <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-white/80 glass px-4 sm:static sm:h-16 sm:border-0 sm:bg-transparent sm:px-6">
-        <div className="flex items-center gap-2 font-semibold">
-          <div className="h-8 w-8 rounded bg-primary flex items-center justify-center">
-            <FileCheck2 className="h-5 w-5 text-white" />
-          </div>
-          <span className="text-xl tracking-tight hidden sm:inline-block">AlignmentChecker (Client)</span>
-        </div>
+        <Link href="/client/dashboard" className="flex items-center gap-2 font-semibold">
+          <PinesphereBrand />
+        </Link>
 
         <div className="ml-auto flex items-center gap-4">
           <Button variant="ghost" size="icon" className="rounded-full">
