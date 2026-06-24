@@ -327,7 +327,6 @@ export default function GitHubIntegrationPage() {
                       <TableHead className="w-[80px]">PR #</TableHead>
                       <TableHead>Title</TableHead>
                       <TableHead>Branch</TableHead>
-                      <TableHead>Status</TableHead>
                       <TableHead>Files</TableHead>
                       <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
@@ -343,15 +342,6 @@ export default function GitHubIntegrationPage() {
                         </TableCell>
                         <TableCell className="font-mono text-[11px] max-w-[120px] truncate" title={pr.branch}>
                           {pr.branch || "main"}
-                        </TableCell>
-                        <TableCell>
-                          <Badge className={
-                            pr.status === "merged" ? "bg-purple-100 text-purple-800" :
-                            pr.status === "closed" ? "bg-red-100 text-red-800" :
-                            "bg-green-100 text-green-800"
-                          }>
-                            {pr.status}
-                          </Badge>
                         </TableCell>
                         <TableCell className="text-xs text-muted-foreground font-semibold">
                           {pr.changed_files?.length || 0}

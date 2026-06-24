@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { useSearchParams } from "next/navigation";
 import { api, Project, MismatchReport } from "@/lib/api-client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -325,14 +326,33 @@ export default function MismatchReportsPage() {
   // Resolution panel
   const [resolving, setResolving] = useState<MismatchReport | null>(null);
 
+  const searchParams = useSearchParams();
+  const projectParam = typeof searchParams?.get === "function" ? searchParams.get("projectId") : null;
+
   useEffect(() => {
     async function init() {
       try {
         const projList = await api.getProjects();
         setProjects(projList);
-        if (projList.length > 0) {
-          setSelectedProjectId(projList[0].id);
+
+        // Determine initial project selection: URL param -> lastProjectId -> first project
+        let initialId = "";
+        if (projectParam && projList.some((p) => p.id === projectParam)) {
+          initialId = projectParam;
         }
+
+        if (!initialId && typeof window !== "undefined") {
+          const last = localStorage.getItem("lastProjectId");
+          if (last && projList.some((p) => p.id === last)) {
+            initialId = last;
+          }
+        }
+
+        if (!initialId && projList.length > 0) {
+          initialId = projList[0].id;
+        }
+
+        setSelectedProjectId(initialId);
       } catch (err: unknown) {
         const message = err instanceof Error ? err.message : "Failed to load projects.";
         setError(message);
@@ -341,6 +361,8 @@ export default function MismatchReportsPage() {
       }
     }
     init();
+    // Intentionally run once on mount; deps include projectParam but searchParams is stable for initial mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadReports = useCallback(async () => {
