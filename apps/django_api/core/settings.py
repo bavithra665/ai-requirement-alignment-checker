@@ -114,6 +114,14 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3001",
     "https://nextjs-web-cxlt.onrender.com",
 ]
+CORS_ALLOW_HEADERS = [
+    "accept",
+    "authorization",
+    "content-type",
+    "origin",
+    "x-csrftoken",
+    "x-requested-with",
+]
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
