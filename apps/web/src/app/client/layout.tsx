@@ -3,7 +3,7 @@
 import { ReactNode, useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { FileCheck2, LogOut, Bell } from "lucide-react";
+import { LogOut, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/auth";
 

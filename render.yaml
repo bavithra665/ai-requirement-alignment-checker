@@ -7,7 +7,7 @@ services:
     env: python
     plan: free
     rootDir: apps/django_api
-    buildCommand: "./build.sh"
+    buildCommand: "bash ./build.sh"
     startCommand: "gunicorn core.wsgi:application --bind 0.0.0.0:$PORT"
     envVars:
       - key: DJANGO_DATABASE_URL

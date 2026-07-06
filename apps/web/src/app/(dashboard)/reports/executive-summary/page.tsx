@@ -77,7 +77,7 @@ export default function ExecutiveSummaryPage() {
     try {
       setGenerating(true);
       setError(null);
-      // @ts-ignore
+      // @ts-expect-error - no types for jspdf-html2canvas
       const html2PDF = (await import("jspdf-html2canvas")).default;
       const element = document.getElementById("report-content");
       if (!element) return;

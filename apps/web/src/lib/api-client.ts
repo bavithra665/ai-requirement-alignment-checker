@@ -297,7 +297,7 @@ export const api = {
     });
   },
 
-  async getApprovals(): Promise<any[]> {
+  async getApprovals(): Promise<unknown[]> {
     return apiFetch("/requirements/approvals");
   },
 
