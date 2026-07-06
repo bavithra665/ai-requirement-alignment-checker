@@ -29,15 +29,10 @@ services:
     startCommand: "npm run start"
     envVars:
       - key: NEXT_PUBLIC_API_URL
-        fromService:
-          type: web
-          name: django-api
-          property: url
-        value: "https://django-api-onrender.com" # Fallback
+        value: "UPDATE_THIS_URL_LATER" # We will update this in the dashboard after the backend gets its URL
 
 databases:
   # 3. PostgreSQL Database
   - name: alignment-checker-db
     databaseName: alignment_checker_django
-    user: postgres
     plan: free
