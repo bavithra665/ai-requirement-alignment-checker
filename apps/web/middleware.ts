@@ -4,8 +4,9 @@ import type { NextRequest } from 'next/server'
 export async function middleware(request: NextRequest) {
   const token = request.cookies.get('access_token')
   const isAuthPage = request.nextUrl.pathname.startsWith('/login') || request.nextUrl.pathname.startsWith('/register')
+  const isPublicPage = request.nextUrl.pathname === '/'
 
-  if (!token && !isAuthPage) {
+  if (!token && !isAuthPage && !isPublicPage) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
