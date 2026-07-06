@@ -122,10 +122,10 @@ class ReportingService:
         current_user_id: UUID,
     ) -> List[MismatchReport]:
         """
-        Query all AlignmentResults for the project where alignment_status != 'Aligned'.
-        Create/update MismatchReport records for each.
+        Rebuild mismatch reports from the current alignment results for the project.
+        Any existing report that no longer maps to a current non-aligned alignment result
+        is marked as deleted so stale rows do not keep showing up.
         """
-        # Fetch non-aligned results
         stmt = select(AlignmentResult).where(
             AlignmentResult.project_id == project_id,
             AlignmentResult.is_deleted == False,
@@ -134,11 +134,6 @@ class ReportingService:
         result = await db.execute(stmt)
         misaligned_results: List[AlignmentResult] = list(result.scalars().all())
 
-        if not misaligned_results:
-            logger.info(f"No misaligned results found for project {project_id}")
-            return []
-
-        # Fetch existing mismatch reports keyed by alignment_result_id
         stmt = select(MismatchReport).where(
             MismatchReport.project_id == project_id,
             MismatchReport.is_deleted == False,
@@ -147,6 +142,18 @@ class ReportingService:
         existing_reports = {
             r.alignment_result_id: r for r in result.scalars().all()
         }
+
+        current_alignment_ids = {ar.id for ar in misaligned_results}
+        stale_reports = [
+            report for report in existing_reports.values()
+            if report.alignment_result_id not in current_alignment_ids
+        ]
+
+        for report in stale_reports:
+            report.is_deleted = True
+            report.deleted_at = None
+            report.updated_by_id = current_user_id
+            db.add(report)
 
         created_reports: List[MismatchReport] = []
 
@@ -168,7 +175,6 @@ class ReportingService:
             suggested_fix = _auto_suggested_fix(mismatch_type, severity)
 
             if ar.id in existing_reports:
-                # Update existing report
                 existing = existing_reports[ar.id]
                 existing.mismatch_type = mismatch_type
                 existing.description = description
@@ -178,7 +184,6 @@ class ReportingService:
                 db.add(existing)
                 created_reports.append(existing)
             else:
-                # Create new report
                 report_in = MismatchReportCreate(
                     project_id=project_id,
                     alignment_result_id=ar.id,

@@ -2,9 +2,55 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
+import { api } from "@/lib/api-client";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { FileCheck2, Users, Zap, BarChart3, ArrowRight, CheckCircle } from "lucide-react";
+
+const ELetter = () => (
+  <span className="inline-flex flex-col justify-between h-[11px] w-[8.5px] py-[0.75px] mx-[0.5px] shrink-0 align-middle">
+    <span className="h-[2px] w-full bg-current rounded-[1px]"></span>
+    <span className="h-[2px] w-full bg-current rounded-[1px]"></span>
+    <span className="h-[2px] w-full bg-current rounded-[1px]"></span>
+  </span>
+);
+
+const PinesphereBrand = () => (
+  <div className="flex items-center gap-2.5 select-none">
+    <div className="relative h-10 w-10 shrink-0 rounded-md overflow-hidden shadow-sm">
+      <Image
+        src="/pinesphere-logo.png"
+        alt="Pinesphere logo"
+        fill
+        className="object-contain"
+      />
+    </div>
+    <div className="hidden sm:flex items-center gap-2 leading-none">
+      <span className="font-extrabold tracking-widest text-[15px] uppercase flex items-center shrink-0">
+        <span className="text-[#3792d7] flex items-center">
+          <span>P</span>
+          <span>I</span>
+          <span>N</span>
+          <ELetter />
+        </span>
+        <span className="text-slate-800 flex items-center ml-[2px]">
+          <span>S</span>
+          <span>P</span>
+          <span>H</span>
+          <ELetter />
+          <span>R</span>
+          <ELetter />
+        </span>
+      </span>
+      <span className="h-5 w-[1px] bg-slate-200 shrink-0" />
+      <div className="flex flex-col text-[9px] font-bold text-slate-500 uppercase tracking-wider leading-tight shrink-0">
+        <span>Requirement</span>
+        <span>To Implementation</span>
+      </div>
+    </div>
+  </div>
+);
 
 export default function Home() {
   const router = useRouter();
@@ -15,24 +61,19 @@ export default function Home() {
     const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
     if (token) {
-      // User is logged in, redirect to appropriate dashboard
+      // User is logged in, use api helper which handles token refresh
       const checkRole = async () => {
         try {
-          const response = await fetch("http://localhost:8001/api/v1/auth/me", {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-          if (response.ok) {
-            const user = await response.json();
-            if (user.role === "client") {
-              router.push("/client/dashboard");
-            } else {
-              router.push("/dashboard");
-            }
+          const user = await api.getMe();
+          if (user?.role === "client") {
+            router.push("/client/dashboard");
+          } else {
+            router.push("/dashboard");
           }
-        } catch (error) {
-          console.error("Failed to check auth:", error);
+        } catch (error: unknown) {
+          // If the API call fails (network, CORS, server down, or unauthenticated),
+          // log nicely and fall back to showing the landing page (user can sign in).
+          console.warn("Could not verify session with backend:", error);
         } finally {
           setIsChecking(false);
         }
@@ -67,10 +108,7 @@ export default function Home() {
       <nav className="sticky top-0 z-50 backdrop-blur-xl bg-white/70 border-b border-gray-100/50 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3 font-bold">
-            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-400 flex items-center justify-center shadow-lg shadow-blue-500/30">
-              <FileCheck2 className="h-6 w-6 text-white" />
-            </div>
-            <span className="text-2xl tracking-tight bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">AlignmentChecker</span>
+            <PinesphereBrand />
           </div>
           <div className="flex items-center gap-6">
             <a href="#features" className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors">

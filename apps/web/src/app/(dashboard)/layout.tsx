@@ -1,9 +1,10 @@
 "use client";
 
 import { ReactNode, useState, useRef, useEffect } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { FileCheck2, LayoutDashboard, Settings, Users, LogOut, Bell, Zap, ShieldAlert, BarChart3, FileBarChart, Activity, LucideIcon } from "lucide-react";
+import { FileCheck2, LayoutDashboard, Settings, Users, LogOut, Zap, ShieldAlert, BarChart3, FileBarChart, Activity, LucideIcon } from "lucide-react";
 import { useAuth } from "@/context/auth";
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api-client";
@@ -45,15 +46,14 @@ const ELetter = () => (
 
 const PinesphereBrand = () => (
   <div className="flex items-center gap-2.5 select-none">
-    <div 
-      className="h-10 w-10 shrink-0 rounded-md shadow-sm" 
-      style={{
-        backgroundImage: "url('/pinesphere-logo.png')",
-        backgroundRepeat: "no-repeat",
-        backgroundPosition: "center -3px",
-        backgroundSize: "155% auto"
-      }}
-    />
+    <div className="relative h-10 w-10 shrink-0 rounded-md overflow-hidden shadow-sm">
+      <Image
+        src="/pinesphere-logo.png"
+        alt="Pinesphere logo"
+        fill
+        className="object-contain"
+      />
+    </div>
     <div className="hidden sm:flex items-center gap-2 leading-none">
       <span className="font-extrabold tracking-widest text-[15px] uppercase flex items-center shrink-0">
         <span className="text-[#3792d7] flex items-center">

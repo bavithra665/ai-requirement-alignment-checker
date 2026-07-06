@@ -377,7 +377,8 @@ export default function MismatchReportsPage() {
         statusFilter || undefined,
         severityFilter || undefined
       );
-      setReports(data);
+      const scopedReports = data.filter((report) => report.project_id === selectedProjectId);
+      setReports(scopedReports);
     } catch {
       setReports([]);
     }
