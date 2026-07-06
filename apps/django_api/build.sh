@@ -7,7 +7,7 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 export PATH="$HOME/.cargo/bin:$PATH"
 
 # Install dependencies via uv pip
-uv pip install --system -e .
+uv pip install --system -r requirements.txt
 
 # Run database migrations
 python manage.py migrate
