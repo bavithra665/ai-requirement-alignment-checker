@@ -30,7 +30,7 @@ export default function ApprovalsPage() {
   const loadApprovals = async () => {
     try {
       setIsLoading(true);
-      const data: ApprovalRequest[] = await api.getApprovals();
+      const data = (await api.getApprovals()) as ApprovalRequest[];
       setPending(data.filter((a) => a.status === "pending"));
       setRequested(data.filter((a) => a.status === "requested_changes"));
       setRejected(data.filter((a) => a.status === "rejected"));
