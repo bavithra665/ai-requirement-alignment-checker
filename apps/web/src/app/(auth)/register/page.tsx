@@ -49,6 +49,7 @@ export default function RegisterPage() {
 
     try {
       const url = `${process.env.NEXT_PUBLIC_API_URL}/auth/register`;
+      if (!process.env.NEXT_PUBLIC_API_URL) console.error("Missing NEXT_PUBLIC_API_URL env var");
       console.log("Register URL:", url);
       const response = await fetch(url, {
         method: "POST",
