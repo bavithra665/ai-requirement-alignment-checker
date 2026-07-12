@@ -39,7 +39,9 @@ services:
     startCommand: "npm run start"
     envVars:
       - key: NEXT_PUBLIC_API_URL
-        value: "UPDATE_THIS_URL_LATER" # We will update this in the dashboard after the backend gets its URL
+        value: "https://django-api-jbyo.onrender.com"
+      - key: BACKEND_URL
+        value: "https://django-api-jbyo.onrender.com"
 
 databases:
   # 3. PostgreSQL Database
