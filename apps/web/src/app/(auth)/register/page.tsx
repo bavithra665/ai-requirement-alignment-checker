@@ -48,7 +48,8 @@ export default function RegisterPage() {
     setIsLoading(true);
 
     try {
-      const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8001";
+      const base = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8001";
+      const apiBaseUrl = base.endsWith("/api/v1") ? base : `${base}/api/v1`;
       const url = `${apiBaseUrl}/auth/register`;
       if (!process.env.NEXT_PUBLIC_API_URL) console.warn("Missing NEXT_PUBLIC_API_URL env var, using fallback");
       console.log("Register URL:", url);

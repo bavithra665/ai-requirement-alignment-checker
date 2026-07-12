@@ -43,7 +43,8 @@ export default function LoginPage() {
       await api.login(formData);
 
       // Get user info to check role
-      const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8001";
+      const base = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8001";
+      const apiBaseUrl = base.endsWith("/api/v1") ? base : `${base}/api/v1`;
       const response = await fetch(`${apiBaseUrl}/auth/me`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
