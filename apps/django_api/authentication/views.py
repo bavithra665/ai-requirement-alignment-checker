@@ -91,6 +91,16 @@ def me_view(request):
     return Response(serializer.data)
 
 
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def debug_users_view(request):
+    from .models import CustomUser
+    users = CustomUser.objects.all()
+    return Response({
+        "users": [{"id": str(u.id), "username": u.username, "email": u.email, "role": u.role} for u in users]
+    })
+
+
 from rest_framework_simplejwt.views import TokenRefreshView
 
 class CookieTokenRefreshView(TokenRefreshView):
