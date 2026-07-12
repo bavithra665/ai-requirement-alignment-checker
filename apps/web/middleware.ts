@@ -2,13 +2,17 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
+  // NOTE: tokens are stored in localStorage by the frontend (api-client.ts), not as cookies.
+  // So middleware cannot reliably check authentication. Disable auth redirects here to prevent
+  // breaking login/register flows on deployed environments.
   const token = request.cookies.get('access_token')
   const isAuthPage = request.nextUrl.pathname.startsWith('/login') || request.nextUrl.pathname.startsWith('/register')
   const isPublicPage = request.nextUrl.pathname === '/'
 
-  if (!token && !isAuthPage && !isPublicPage) {
-    return NextResponse.redirect(new URL('/login', request.url))
-  }
+  void token
+  void isAuthPage
+  void isPublicPage
+
 
   if (token && isAuthPage) {
     // Attempt to resolve role from backend using the access token
