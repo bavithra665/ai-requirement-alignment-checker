@@ -67,7 +67,7 @@ export default function RegisterPage() {
       if (response.ok) {
         router.push("/login?registered=true");
       } else {
-        let data: any = null;
+        let data: { detail?: string } | null = null;
         try {
           data = await response.json();
         } catch {
