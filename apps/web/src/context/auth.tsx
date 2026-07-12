@@ -34,7 +34,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       try {
         const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
         if (token) {
-          const response = await fetch('http://localhost:8001/api/v1/auth/me', {
+          const base = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8001";
+          const apiBaseUrl = base.endsWith("/api/v1") ? base : `${base}/api/v1`;
+          const response = await fetch(`${apiBaseUrl}/auth/me`, {
             headers: {
               'Authorization': `Bearer ${token}`,
             },
@@ -69,7 +71,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
       if (token) {
-        const response = await fetch('http://localhost:8001/api/v1/auth/me', {
+        const base = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8001";
+        const apiBaseUrl = base.endsWith("/api/v1") ? base : `${base}/api/v1`;
+        const response = await fetch(`${apiBaseUrl}/auth/me`, {
           headers: {
             'Authorization': `Bearer ${token}`,
           },
