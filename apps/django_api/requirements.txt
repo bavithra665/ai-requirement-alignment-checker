@@ -1,3 +1,5 @@
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.2.1+cpu
 bcrypt>=5.0.0
 chromadb>=1.5.9
 django>=5.2.15
